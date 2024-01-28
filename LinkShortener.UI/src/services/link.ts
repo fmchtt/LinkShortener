@@ -11,6 +11,14 @@ export async function getLinks() {
   return data;
 }
 
+export type CreateLinkParams = {
+  href: string;
+};
+export async function createLink(body: CreateLinkParams) {
+  const { data } = await http.post<Link>(`links/`, body);
+  return data;
+}
+
 export async function deleteLink(linkId: string) {
   const { data } = await http.delete(`links/${linkId}/`);
   return data;
