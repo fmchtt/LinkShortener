@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LinkShortner.Api.Controllers;
 
-[ApiController, Route("links")]
+[ApiController]
 public class LinkController(IMapper mapper, IMediator mediator) : BaseController
 {
     [HttpGet("{hash}")]
@@ -24,11 +24,11 @@ public class LinkController(IMapper mapper, IMediator mediator) : BaseController
         }
         catch (NotFoundException e)
         {
-            HttpContext.Response.Redirect("/");
+            HttpContext.Response.Redirect("/notFound");
         }
     }
     
-    [HttpGet, Authorize]
+    [HttpGet("links"), Authorize]
     public async Task<List<LinkResumed>> GetUserLinks()
     {
         var user = await GetUser();
@@ -38,7 +38,7 @@ public class LinkController(IMapper mapper, IMediator mediator) : BaseController
         return mapper.Map<List<LinkResumed>>(links);
     }
 
-    [HttpPost, Authorize]
+    [HttpPost("links"), Authorize]
     public async Task<LinkResumed> CreateLink(CreateLinkCommand command)
     {
         var user = await GetUser();
@@ -48,7 +48,7 @@ public class LinkController(IMapper mapper, IMediator mediator) : BaseController
         return mapper.Map<LinkResumed>(result);
     }
 
-    [HttpDelete("{linkId:Guid}"), Authorize]
+    [HttpDelete("links/{linkId:Guid}"), Authorize]
     public async Task<string> DeleteLink(Guid linkId)
     {
         var user = await GetUser();

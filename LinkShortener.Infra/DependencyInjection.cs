@@ -35,6 +35,7 @@ public static class DependencyInjection
         services.AddAutoMapper(typeof(LinkMapper));
 
         services.AddTransient<IHasher, Hasher>();
+        services.AddTransient<ITokenService, TokenService>();
 
         services.AddMediatR(conf => conf.RegisterServicesFromAssembly(AppDomain.CurrentDomain.Load("LinkShortener.Domain")));
 

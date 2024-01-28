@@ -7,7 +7,7 @@ public class Link
     public string Href { get; set; } = string.Empty;
     public int Views { get; set; } = 0;
     public Guid OwnerId { get; set; } = Guid.Empty;
-    public virtual User Owner { get; set; } = new();
+    public virtual User Owner { get; set; }
     
     public Link() {}
     public Link(string href, string hash, User owner)

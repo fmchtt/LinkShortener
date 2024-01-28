@@ -1,6 +1,4 @@
-﻿using LinkShortner.Domain.Utilities;
-
-namespace LinkShortner.Domain.Entities;
+﻿namespace LinkShortner.Domain.Entities;
 
 public class User
 {

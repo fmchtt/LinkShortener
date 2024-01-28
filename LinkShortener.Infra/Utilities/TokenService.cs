@@ -10,9 +10,10 @@ namespace LinkShortner.Infra.Utilities;
 
 public class TokenService(IConfiguration configuration) : ITokenService
 {
-    private byte[] SecretKey { get; } =
-        Encoding.ASCII.GetBytes(configuration["SecretKey"] ??
-                                throw new ArgumentException("Secret key não encontrada!"));
+    private byte[] SecretKey { get; } = Encoding.ASCII.GetBytes(
+        configuration["SecretKey"] ??
+        throw new ArgumentException("Secret key não encontrada!")
+    );
 
     public string GenerateToken(User user)
     {

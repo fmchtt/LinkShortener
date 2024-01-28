@@ -23,7 +23,7 @@ public class LinkRepository(LinkShortnerDbContext dbContext) : ILinkRepository
 
     public async Task<bool> VerifyHash(string hash)
     {
-        return await dbContext.Links.AnyAsync(l => l.Hash == hash);
+        return !await dbContext.Links.AnyAsync(l => l.Hash == hash);
     }
 
     public async Task Create(Link link)

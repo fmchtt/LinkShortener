@@ -13,7 +13,7 @@ public class UserController(IMapper mapper, IMediator mediator) : BaseController
     [HttpGet("me"), Authorize]
     public async Task<UserResumed> GetActualUser()
     {
-        var user = await GetActualUser();
+        var user = await GetUser();
         return mapper.Map<UserResumed>(user);
     }
 
