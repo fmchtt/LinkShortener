@@ -1,14 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { PropsWithChildren, createContext, useEffect } from "react";
-import {
-  GetActualUser,
-  Login,
-  LoginBody,
-  Register,
-  RegisterBody,
-} from "../services/user";
+import { PropsWithChildren, createContext } from "react";
+import { Login, LoginBody, Register, RegisterBody } from "../services/user";
 import http from "../services/http";
-import { redirect } from "@tanstack/react-router";
 import { userQuery } from "@/queries/userQuery";
 
 export type User = {
@@ -21,6 +14,7 @@ export type AuthContextProps = {
   isLoading: boolean;
   login: (loginParams: LoginBody) => Promise<void>;
   register: (registerParams: RegisterBody) => Promise<void>;
+  logout: () => void;
 };
 
 export const AuthContext = createContext<AuthContextProps>({
@@ -28,23 +22,34 @@ export const AuthContext = createContext<AuthContextProps>({
   isLoading: true,
   login: async () => {},
   register: async () => {},
+  logout: () => {},
 });
 
 export function AuthContextProvider(props: PropsWithChildren) {
-  const { data: user, isLoading } = useQuery({
-    queryKey: ["user"],
-    queryFn: () => GetActualUser(),
-    retry: false,
-  });
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      http.defaults.headers.common.Authorization = `Bearer ${token}`;
-    }
-  }, []);
+  const { data: user, isLoading } = useQuery(userQuery);
 
   const client = useQueryClient();
+
+  async function login(loginParams: LoginBody) {
+    const token = await Login(loginParams);
+    localStorage.setItem("token", token.accessToken);
+    http.defaults.headers.common.Authorization = `Bearer ${token.accessToken}`;
+    client.prefetchQuery(userQuery);
+  }
+
+  async function register(registerParams: RegisterBody) {
+    const token = await Register(registerParams);
+    localStorage.setItem("token", token.accessToken);
+    http.defaults.headers.common.Authorization = `Bearer ${token.accessToken}`;
+    client.prefetchQuery(userQuery);
+  }
+
+  function logout() {
+    localStorage.removeItem("token");
+    http.defaults.headers.common.Authorization = null;
+    client.setQueryData(["user"], null);
+    if (location.pathname !== "/login") location.href = "/login";
+  }
 
   http.interceptors.response.use(
     (success) => {
@@ -52,34 +57,15 @@ export function AuthContextProvider(props: PropsWithChildren) {
     },
     (error) => {
       if (error.response.status === 401 || error.response.status === 403) {
-        localStorage.removeItem("token");
-        http.defaults.headers.common.Authorization = null;
-        client.setQueryData(["user"], null);
-        throw redirect({
-          to: "/login",
-        });
+        logout();
       }
 
       return Promise.reject(error);
     }
   );
 
-  async function login(loginParams: LoginBody) {
-    const token = await Login(loginParams);
-    http.defaults.headers.common.Authorization = `Bearer ${token.accessToken}`;
-    localStorage.setItem("token", token.accessToken);
-    client.prefetchQuery(userQuery);
-  }
-
-  async function register(registerParams: RegisterBody) {
-    const token = await Register(registerParams);
-    http.defaults.headers.common.Authorization = `Bearer ${token.accessToken}`;
-    localStorage.setItem("token", token.accessToken);
-    client.prefetchQuery(userQuery);
-  }
-
   return (
-    <AuthContext.Provider value={{ user, login, register, isLoading }}>
+    <AuthContext.Provider value={{ user, isLoading, login, register, logout }}>
       {props.children}
     </AuthContext.Provider>
   );

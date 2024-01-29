@@ -61,12 +61,15 @@ export default function LoginPage() {
       })
       .catch(() => {
         loginForm.setError("root", { message: "Usuário ou senha inválidos!" });
+      })
+      .finally(() => {
         setLoading(false);
       });
   }
 
   return (
-    <div className="w-1/4 min-h-screen flex justify-center align-middle bg-slate-700 border-r-slate-800 border-r-2">
+    <div className="w-1/5 min-h-screen flex flex-col justify-center align-middle bg-slate-700 border-r-slate-800 border-r-2">
+      <h1 className="text-center text-2xl text-white">Link Shortner</h1>
       <Form {...loginForm}>
         <form
           onSubmit={loginForm.handleSubmit(onSubmit)}
@@ -83,6 +86,7 @@ export default function LoginPage() {
                     <Input
                       type="email"
                       placeholder="email@email.com"
+                      className="bg-transparent placeholder:text-white text-white"
                       {...field}
                     />
                   </FormControl>
@@ -102,6 +106,7 @@ export default function LoginPage() {
                     <Input
                       type="password"
                       placeholder="*************"
+                      className="bg-transparent placeholder:text-white text-white"
                       {...field}
                     />
                   </FormControl>
@@ -110,7 +115,7 @@ export default function LoginPage() {
               );
             }}
           />
-          <Button disabled={loading} type="submit">
+          <Button disabled={loading} type="submit" className="bg-slate-900">
             Entrar
           </Button>
         </form>
