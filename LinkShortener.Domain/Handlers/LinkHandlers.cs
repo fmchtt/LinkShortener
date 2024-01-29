@@ -1,4 +1,5 @@
-﻿using LinkShortner.Domain.Commands;
+﻿using LinkShortner.Domain.Cache;
+using LinkShortner.Domain.Commands;
 using LinkShortner.Domain.Entities;
 using LinkShortner.Domain.Exceptions;
 using LinkShortner.Domain.Queries;
@@ -8,11 +9,11 @@ using MediatR;
 
 namespace LinkShortner.Domain.Handlers;
 
-public class LinkHandlers(ILinkRepository linkRepository, IHasher hasher) : 
+public class LinkHandlers(ILinkRepository linkRepository, IHasher hasher, ILinkCache linkCache) :
     IRequestHandler<CreateLinkCommand, Link>,
     IRequestHandler<DeleteLinkCommand>,
     IRequestHandler<GetUserLinksQuery, List<Link>>,
-    IRequestHandler<GetByHashQuery, Link>
+    IRequestHandler<GetByHashQuery, string>
 {
     public async Task<Link> Handle(CreateLinkCommand request, CancellationToken cancellationToken)
     {
@@ -26,7 +27,7 @@ public class LinkHandlers(ILinkRepository linkRepository, IHasher hasher) :
 
         var link = new Link(request.Href, hash, request.Actor);
         await linkRepository.Create(link);
-        
+
         return link;
     }
 
@@ -48,11 +49,22 @@ public class LinkHandlers(ILinkRepository linkRepository, IHasher hasher) :
         return await linkRepository.GetByOwner(request.Actor.Id);
     }
 
-    public async Task<Link> Handle(GetByHashQuery request, CancellationToken cancellationToken)
+    public async Task<string> Handle(GetByHashQuery request, CancellationToken cancellationToken)
     {
+        var linkCached = await linkCache.GetHrefByHash(request.Hash);
+        if (linkCached != null)
+        {
+#pragma warning disable CS4014
+            linkRepository.UpdateLinkCounterByHash(request.Hash);
+            return linkCached;
+        }
+
         var link = await linkRepository.GetByHash(request.Hash);
         NotFoundException.ThrowIfNull(link, "Hash não encontrado!");
-        
-        return link;
+
+#pragma warning disable CS4014
+        linkCache.SaveHrefToCache(link);
+
+        return link.Href;
     }
 }

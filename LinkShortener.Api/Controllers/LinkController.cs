@@ -15,12 +15,12 @@ public class LinkController(IMapper mapper, IMediator mediator) : BaseController
     [HttpGet("{hash}")]
     public async Task GetLink(string hash)
     {
-        var command = new GetByHashQuery(hash);
+        var query = new GetByHashQuery(hash);
         
         try
         {
-            var result = await mediator.Send(command);
-            HttpContext.Response.Redirect(result.Href);
+            var result = await mediator.Send(query);
+            HttpContext.Response.Redirect(result);
         }
         catch (NotFoundException e)
         {

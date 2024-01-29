@@ -1,6 +1,8 @@
-﻿using LinkShortner.Domain.Handlers;
+﻿using LinkShortner.Domain.Cache;
+using LinkShortner.Domain.Handlers;
 using LinkShortner.Domain.Repositories;
 using LinkShortner.Domain.Utilities;
+using LinkShortner.Infra.Cache;
 using LinkShortner.Infra.Mappers;
 using LinkShortner.Infra.Repositories;
 using LinkShortner.Infra.Utilities;
@@ -37,7 +39,13 @@ public static class DependencyInjection
         services.AddTransient<IHasher, Hasher>();
         services.AddTransient<ITokenService, TokenService>();
 
-        services.AddMediatR(conf => conf.RegisterServicesFromAssembly(AppDomain.CurrentDomain.Load("LinkShortener.Domain")));
+        services.AddSingleton<ILinkCache, RedisCache>();
+
+        services.AddMediatR(
+            conf => conf.RegisterServicesFromAssembly(
+                AppDomain.CurrentDomain.Load("LinkShortener.Domain")
+            )
+        );
 
         return services;
     }

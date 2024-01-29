@@ -19,6 +19,7 @@
       </PackageReference>
       <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="8.0.1" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.1" />
+      <PackageReference Include="StackExchange.Redis" Version="2.7.17" />
     </ItemGroup>
 
     <ItemGroup>

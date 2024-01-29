@@ -3,4 +3,4 @@ using MediatR;
 
 namespace LinkShortner.Domain.Queries;
 
-public record GetByHashQuery(string Hash) : IRequest<Link>;
+public record GetByHashQuery(string Hash) : IRequest<string>;

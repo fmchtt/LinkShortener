@@ -26,6 +26,15 @@ public class LinkRepository(LinkShortnerDbContext dbContext) : ILinkRepository
         return !await dbContext.Links.AnyAsync(l => l.Hash == hash);
     }
 
+    public async Task UpdateLinkCounterByHash(string hash)
+    {
+        await dbContext.Links.Where(l => l.Hash == hash).ExecuteUpdateAsync(
+            setters => setters.SetProperty(
+                l => l.Views, l => l.Views + 1
+            )
+        );
+    }
+
     public async Task Create(Link link)
     {
         await dbContext.Links.AddAsync(link);
