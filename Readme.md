@@ -1,4 +1,7 @@
-﻿# Encurtador de links
+﻿![Home da aplicação](./home.png)
+
+
+# Encurtador de links
 
 Esse projeto é um encurtador de links, feito com o objetivo de aprofundar meus conhecimentos em .net, utilizando banco de dados, CQS, cache e arquitetura limpa.
 
