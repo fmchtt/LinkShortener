@@ -4,6 +4,7 @@ export type Link = {
   id: string;
   href: string;
   hash: string;
+  views: number;
 };
 
 export async function getLinks() {

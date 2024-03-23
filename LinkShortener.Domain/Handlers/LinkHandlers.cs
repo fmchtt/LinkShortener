@@ -54,16 +54,13 @@ public class LinkHandlers(ILinkRepository linkRepository, IHasher hasher, ILinkC
         var linkCached = await linkCache.GetHrefByHash(request.Hash);
         if (linkCached != null)
         {
-#pragma warning disable CS4014
-            linkRepository.UpdateLinkCounterByHash(request.Hash);
             return linkCached;
         }
 
         var link = await linkRepository.GetByHash(request.Hash);
         NotFoundException.ThrowIfNull(link, "Hash não encontrado!");
 
-#pragma warning disable CS4014
-        linkCache.SaveHrefToCache(link);
+        await linkCache.SaveHrefToCache(link);
 
         return link.Href;
     }

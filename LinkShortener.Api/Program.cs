@@ -1,11 +1,28 @@
 using System.Text;
 using LinkShortner.Api.Filters;
+using LinkShortner.Api.Services;
 using LinkShortner.Infra;
+using Serilog;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog.Events;
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog(
+    (context, services, configuration) => configuration
+    .ReadFrom.Configuration(context.Configuration)
+    .ReadFrom.Services(services)
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -65,8 +82,11 @@ builder.Services.AddControllers(
     x => x.Filters.Add(new ExceptionHandlerFilter())
 );
 builder.Services.AddInfraestructure(builder.Configuration);
+builder.Services.AddHostedService<FlushCache>();
 
 var app = builder.Build();
+
+app.UseSerilogRequestLogging();
 
 app.UseCors(options =>
 {

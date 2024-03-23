@@ -58,6 +58,10 @@ export default function LinkCard({ link }: LinkCardProps) {
             {link.hash}
           </a>
         </span>
+        <span className="text-white block">
+          <strong>Visitas: </strong>
+          {link.views}
+        </span>
       </CardDescription>
       <CardFooter className="p-0">
         <Button

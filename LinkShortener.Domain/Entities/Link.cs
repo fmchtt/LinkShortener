@@ -8,7 +8,8 @@ public class Link
     public int Views { get; set; } = 0;
     public Guid OwnerId { get; set; } = Guid.Empty;
     public virtual User Owner { get; set; }
-    
+
+#pragma warning disable CS8618
     public Link() {}
     public Link(string href, string hash, User owner)
     {
@@ -16,5 +17,6 @@ public class Link
         Href = href;
         Hash = hash;
         OwnerId = owner.Id;
+        Owner = owner;
     }
 }

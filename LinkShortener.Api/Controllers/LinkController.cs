@@ -22,7 +22,7 @@ public class LinkController(IMapper mapper, IMediator mediator) : BaseController
             var result = await mediator.Send(query);
             HttpContext.Response.Redirect(result);
         }
-        catch (NotFoundException e)
+        catch
         {
             HttpContext.Response.Redirect("/notFound");
         }

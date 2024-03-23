@@ -1,11 +1,14 @@
 ﻿using LinkShortner.Domain.Entities;
 using LinkShortner.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace LinkShortner.Infra.Repositories;
 
 public class LinkRepository(LinkShortnerDbContext dbContext) : ILinkRepository
 {
+    private IDbContextTransaction? Transaction;
+
     public async Task<Link?> GetByHash(string hash)
     {
         return await dbContext.Links.FirstOrDefaultAsync(l => l.Hash == hash);
@@ -45,5 +48,27 @@ public class LinkRepository(LinkShortnerDbContext dbContext) : ILinkRepository
     {
         dbContext.Links.Remove(link);
         await dbContext.SaveChangesAsync();
+    }
+
+    public async Task<List<Link>> GetByHashList(IEnumerable<string> hashes)
+    {
+        return await dbContext.Links.Where(l => hashes.Contains(l.Hash)).ToListAsync();
+    }
+
+    public async Task Update(Link link)
+    {
+        dbContext.Links.Update(link);
+        await dbContext.SaveChangesAsync();
+    }
+
+    public void BeginTransaction()
+    {
+        Transaction = dbContext.Database.BeginTransaction();
+    }
+
+    public async Task Commit()
+    {
+        if (Transaction == null) return;
+        await Transaction.CommitAsync();
     }
 }
