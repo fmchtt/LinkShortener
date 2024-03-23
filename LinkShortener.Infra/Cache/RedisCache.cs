@@ -57,6 +57,7 @@ public class RedisCache(IConfiguration configuration, ILogger<RedisCache> logger
             logger.LogInformation("Link {Hash} views count saved from {PreviousCount} to {NewCount}", hash, link.Views, viewCount);
             link.Views = viewCount;
             await linkRepository.Update(link);
+            if (await db.KeyExpireTimeAsync(key) == null) await db.KeyExpireAsync(key, new TimeSpan(8, 0, 0));
         }
         await linkRepository.Commit();
         logger.LogInformation("Flush process finalized");
